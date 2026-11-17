@@ -1,0 +1,7 @@
+runtime/
+exports/
+ops/watchdog_log.jsonl
+__pycache__/
+*.pyc
+.pytest_cache/
+models/artifacts/

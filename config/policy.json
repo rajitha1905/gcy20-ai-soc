@@ -1,0 +1,21 @@
+{
+  "_comment": "Decision and response policy for the AI-assisted SOC pipeline. Changes to this file are recorded (by hash) in every decision evidence record.",
+  "internal_networks": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],
+  "protected_assets": {
+    "10.0.0.10": "Domain controller DC01",
+    "10.0.0.11": "Domain controller DC02",
+    "10.0.0.53": "Internal DNS resolver"
+  },
+  "thresholds": {
+    "auto_close_min_confidence": 0.90,
+    "review_below_confidence": 0.75,
+    "escalate_min_confidence": 0.60,
+    "auto_contain_min_confidence": 0.97
+  },
+  "auto_contain": false,
+  "incident_merge_window_minutes": 30,
+  "feature_window_minutes": 5,
+  "business_hours": {"start": 7, "end": 19, "utc_offset_hours": -8},
+  "default_external_reputation": 20,
+  "health": {"max_heartbeat_age_seconds": 15}
+}

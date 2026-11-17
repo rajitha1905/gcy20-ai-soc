@@ -1,0 +1,21 @@
+flowchart TB
+    G["Alert generator<br/>(synthetic Suricata eve.json)"] --> I[("incoming/eve.json")]
+    I --> C["Collector<br/>raw SHA-256, seq, ingest time"]
+    C --> Q[("queue/events.jsonl")]
+    Q --> V{"Validator<br/>schema + evasion checks"}
+    V -- "schema failure" --> R["Human review queue"]
+    V -- "parsed (+flags)" --> F["Feature extraction<br/>5-min sliding window"]
+    F --> M["Decision tree + Isolation Forest<br/>label, confidence, decision path"]
+    M --> P{"Decision policy"}
+    P -- "benign, trusted, conf ≥ 0.90" --> AC["Auto-close"]
+    P -- "flags / low confidence / outlier" --> R
+    P -- "suspicious" --> T["Ticket / incident"]
+    P -- "high risk" --> E["Escalate + containment request"]
+    E --> A{"Analyst approval"}
+    A -- "approve" --> X["Simulated block / quarantine<br/>(protected assets refused)"]
+    A -- "reject / rollback" --> X
+    R --> A
+    AC & T & E & X & R --> L[("Hash-chained evidence log")]
+    L --> D["Streamlit console<br/>+ forensic export ZIP"]
+    W["Host watchdog<br/>(Podman)"] -. "healthcheck / restart" .-> C
+    W -. "logs recovery" .-> L

@@ -1,0 +1,10 @@
+ip,score,source,note
+203.0.113.66,95,lab-threatfeed,Simulated brute-force botnet node
+203.0.113.77,90,lab-threatfeed,Simulated scanner
+203.0.113.99,98,lab-threatfeed,Simulated C2 server
+203.0.113.120,85,lab-threatfeed,Simulated exploit kit host
+198.51.100.23,55,lab-threatfeed,Simulated low-confidence suspicious host
+198.51.100.44,40,lab-threatfeed,Simulated VPS range
+192.0.2.10,0,allowlist,Simulated SaaS provider (backups)
+192.0.2.20,0,allowlist,Simulated software update CDN
+192.0.2.30,0,allowlist,Simulated cloud DNS

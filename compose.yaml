@@ -1,0 +1,62 @@
+# Run with:  podman compose up -d --build
+name: gcy20-soc
+
+x-common: &common
+  build:
+    context: .
+    dockerfile: Containerfile
+  image: localhost/gcy20-soc:latest
+  volumes:
+    - socdata:/data
+  environment:
+    DATA_DIR: /data
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+  collector:
+    <<: *common
+    container_name: soc-collector
+    command: ["python", "-m", "pipeline.collector"]
+    healthcheck:
+      test: ["CMD", "python", "-m", "pipeline.health", "collector"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
+
+  engine:
+    <<: *common
+    container_name: soc-engine
+    command: ["python", "-m", "pipeline.engine"]
+    depends_on:
+      - collector
+    environment:
+      DATA_DIR: /data
+      # Optional LLM enrichment through Ollama running natively on Windows
+      LLM_ENABLED: "false"
+      OLLAMA_URL: http://host.containers.internal:11434
+      OLLAMA_MODEL: llama3.1:8b
+    healthcheck:
+      test: ["CMD", "python", "-m", "pipeline.health", "engine"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+      start_period: 15s
+
+  dashboard:
+    <<: *common
+    container_name: soc-dashboard
+    command: ["streamlit", "run", "dashboard/app.py",
+              "--server.address=0.0.0.0", "--server.port=8501",
+              "--server.headless=true", "--browser.gatherUsageStats=false"]
+    depends_on:
+      - engine
+    ports:
+      - "127.0.0.1:8501:8501"   # localhost only; the console is not exposed to the network
+
+volumes:
+  socdata: {}
